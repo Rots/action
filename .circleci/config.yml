@@ -10,7 +10,6 @@ jobs:
       CODECOV_TOKEN: "ebdd735e-579a-4afd-85fc-f53907544c31"
       DEVOPS_REPO: "git@github.com:ParabolInc/action-devops.git"
       DEVOPS_WORKDIR: "~/action-devops"
-      PRODUCTION_BACKUP_VOLUME: "/mnt/volume-nyc1-01/action-production"
     working_directory: ~/action
     steps:
       - add_ssh_keys:
@@ -119,6 +118,10 @@ jobs:
       GITHUB_REMOTE_DEVELOPMENT: "dokku@action-dev-nyc1-01.parabol.co:web"
       GITHUB_REMOTE_PRODUCTION: "dokku@action-production.parabol.co:web"
       GITHUB_REMOTE_STAGING: "dokku@action-staging.parabol.co:web"
+      PRODUCTION_BACKUP_VOLUME: "/mnt/volume-nyc1-01/action-production"
+    docker:
+      - image: node:10.15.0
+      - image: rethinkdb:2.3.5
     working_directory: ~/action
     steps:
       - deploy:
