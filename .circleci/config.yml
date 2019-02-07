@@ -163,19 +163,28 @@ jobs:
       - store_artifacts:
           path: ~/action/build
           destination: build
-      - run:
-          name: Upload sentry artifacts
-          command: |
-            if [ "${CIRCLE_BRANCH}" == "development" ]; then
-              export ACTION_VERSION=$(grep '"version":' package.json | cut -d\" -f4)
-              sentry-cli releases new "$ACTION_VERSION"
-              sentry-cli releases files "$ACTION_VERSION" upload-sourcemaps ~/action/build
-              sentry-cli releases finalize "$ACTION_VERSION"
-            fi
       - store_test_results:
           path: ~/action/test-report
+  sentry-upload:
+    docker:
+      - image: getsentry/sentry-cli
+    environment:
+      SENTRY_ORG: "parabol"
+      SENTRY_PROJECT: "action-production"
+    steps:
+      - checkout
+      - run:
+        name: Upload sentry artifacts
+        command: |
+          if [ "${CIRCLE_BRANCH}" == "development" ]; then
+            export ACTION_VERSION=$(grep '"version":' package.json | cut -d\" -f4)
+            sentry-cli releases new "$ACTION_VERSION"
+            sentry-cli releases files "$ACTION_VERSION" upload-sourcemaps ~/action/build
+            sentry-cli releases finalize "$ACTION_VERSION"
+          fi
 workflows:
   version: 2
   build-and-deploy:
     jobs:
       - build
+      - sentry-upload
